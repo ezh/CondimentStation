@@ -29,13 +29,21 @@ load("{{package}}")
 {% endfor %}
 
 if (mode() == "load") then
-  local ldlibpaths=os.getenv("LD_LIBRARY_PATH") or ""
-  local fallbacks=os.getenv("DYLD_FALLBACK_LIBRARY_PATH") or ""
-  setenv("_FUNWITH_DYLD_FALLBACK_LIBRARY_PATH", fallbacks)
-  prepend_path("DYLD_FALLBACK_LIBRARY_PATH", ldlibpaths)
+  local ldlibpaths=os.getenv("LD_LIBRARY_PATH")
+  local fallbacks=os.getenv("DYLD_FALLBACK_LIBRARY_PATH")
+  if(fallbacks ~= nil) then
+    setenv("_FUNWITH_DYLD_FALLBACK_LIBRARY_PATH", fallbacks)
+  end
+  if( ldlibpaths ~= nil) then
+    prepend_path("DYLD_FALLBACK_LIBRARY_PATH", ldlibpaths)
+  end
 elseif (mode() == "unload") then
-  local fallbacks=os.getenv("_FUNWITH_DYLD_FALLBACK_LIBRARY_PATH") or ""
-  setenv("DYLD_FALLBACK_LIBRARY_PATH", fallbacks)
+  local fallbacks=os.getenv("_FUNWITH_DYLD_FALLBACK_LIBRARY_PATH")
+  if(fallbacks ~= nil) then
+    setenv("DYLD_FALLBACK_LIBRARY_PATH", fallbacks)
+  else
+    unsetenv("DYLD_FALLBACK_LIBRARY_PATH")
+  end
   unsetenv("_FUNWITH_DYLD_FALLBACK_LIBRARY_PATH")
 end
 
