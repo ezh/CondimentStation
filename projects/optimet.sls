@@ -1,13 +1,14 @@
 {% set project = "optimet" %}
 {% set prefix = salt['funwith.prefix'](project) %}
 {% set home = grains['userhome'] %}
-{% set compiler = "intel" %}
+{% set compiler = "clang" %}
 {% set openmp = "+openmp" if compiler != 'clang' else "-openmp"%}
-{% set ldflags = "/usr/local/Cellar/gcc/5.3.0/lib/gcc/5/libgfortran.dylib" %}
+{% set ldflags = "/usr/local/Cellar/gcc/6.1.0/lib/gcc/6/libgfortran.dylib" %}
 {% set spack_packages = [ "f2c", "gsl", "boost -locale", "hdf5 -fortran -cxx -mpi",
       "Catch", "UCL-RITS.eigen +debug", "openmpi -pmi", "gbenchmark",
-      "scalapack +debug  ^openmpi -pmi ^openblas -openmp %gcc",
-      "belos +mpi -openmp +lapack  ^openmpi -pmi ^openblas -openmp %gcc",
+      "scalapack +debug  ^openmpi -pmi ^openblas -openmp -shared",
+      "openblas -openmp -shared",
+      "belos +mpi -openmp +lapack  ^openmpi -pmi ^openblas -openmp -shared",
 ]%}
 
 {% if compiler == "clang" %}
@@ -31,6 +32,7 @@ belos spack packages:
     - pip_pkgs:
       - pip
       - pandas
+      - numpy
       - scipy
       - numpy
       - jupyter
@@ -56,6 +58,7 @@ belos spack packages:
     - cwd: {{prefix}}/src/{{project}}
     - spack: {{spack_packages}}
     - compiler: {{compiler}}
+    - virtualenv: {{project}}
     - footer: |
         setenv("BLA_VENDOR", "OpenBlas")
 {% if compiler == "clang" %}
@@ -65,6 +68,9 @@ belos spack packages:
         setenv("CXXFLAGS", "-Wno-parentheses -Wno-deprecated-declarations")
         setenv("CXX", "g++-5")
         setenv("CC", "gcc-5")
+{% elif compiler == "intel" %}
+        setenv("CXX", "icpc")
+        setenv("CC", "icc")
 {% endif %}
         setenv("JULIA_PKGDIR", "{{prefix}}/julia")
 
