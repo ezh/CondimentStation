@@ -8,7 +8,7 @@
   "fftw %s" % openmp,
   "GreatCMakeCookoff",
   "eigen -mpfr +fftw -metis -scotch -suitesparse ^fftw %s" %openmp,
-  "gbenchmark", "Catch", "spdlog", "cfitsio", "bison",
+  "gbenchmark", "Catch", "spdlog", "cfitsio", "bison", "wcslib",
   "boost +python -mpi -multithreaded -program_options"
   + " -random -regex -serialization -signals +singlethreaded -system -test -thread -wave"
 ]%}
@@ -35,24 +35,6 @@
           - pandas
           - cython
           - jupyter
-
-{% do spack_packages.append("casacore +fftw +python ^fftw %s" % openmp) %}
-install casacore:
-  spack.installed:
-    - name: {{spack_packages[-1]}}
-    - ignore_deps: True
-    - compiler: {{compiler}}
-
-  cmd.run:
-    - name: |
-        source $SPACK_ROOT/share/spack/setup-env.sh
-        {% for pkg in spack_packages %}
-        spack load {{pkg}}
-        {% endfor %}
-        {{prefix}}/bin/pip install python-casacore
-    - env:
-      - SPACK_ROOT: {{salt['spack.defaults']('directory')}}
-
 
 purify:
   github.present:
