@@ -5,13 +5,13 @@
 {% set dotdir = pillar.get('dotdir', home + "/.dotfiles") %}
 
 Valloric/YouCompleteMe:
-  github.present:
+  github.latest:
     - target: {{home}}/.vim/bundle/YouCompleteMe
 
   cmd.run:
     - name: |
         git submodule update --init --recursive
-        python install.py --system-boost --clang-completer
+        /usr/bin/python install.py --system-boost --clang-completer
     - cwd: {{home}}/.vim/bundle/YouCompleteMe
     - creates:
       - {{bundledir}}/YouCompleteMe/third_party/ycmd/ycm_client_support.so
